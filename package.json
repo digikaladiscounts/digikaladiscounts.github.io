@@ -1,0 +1,17 @@
+{
+  "name": "digikaladiscounts",
+  "version": "1.0.0",
+  "description": "سیستم نمایش تخفیف‌های دیجی‌کالا یک ابزار بسیار مفید و کارآمد برای کاربران است که به دنبال بهترین تخفیف‌ها و پیشنهادات ویژه بر روی محصولات دیجی‌کالا هستند. این سیستم با بهره‌گیری از فناوری‌های روز و طراحی کاربرپسند، تجربه‌ای بی‌نظیر و راحت را برای کاربران فراهم می‌آورد.",
+  "main": "generate-rss.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node generate-rss.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "node-fetch": "^3.3.2"
+  }
+}
