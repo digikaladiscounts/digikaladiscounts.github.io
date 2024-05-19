@@ -1,5 +1,7 @@
 document.addEventListener('DOMContentLoaded', async () => {
     let allProducts = [];
+    let lastFetchedData = [];
+    let permissionGranted = false;
 
     const loading = document.getElementById('loading');
     const searchContainer = document.querySelector('.search-container');
@@ -96,16 +98,69 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    // Fetch data and setup UI
-    try {
-        const data = await fetchData();
-        allProducts = data;
-        displayProducts(data);
-        setupSearch(data);
-        loading.style.display = 'none';
-        searchContainer.style.display = 'flex';
-        productContainer.style.display = 'flex';
-    } catch (error) {
-        console.error('Failed to initialize:', error);
+    // Function to show notifications
+    function showNotification(title, options) {
+        if (permissionGranted && Notification.permission === 'granted') {
+            new Notification(title, options);
+        }
     }
+
+    // Function to check for new discounts and notify
+    function checkForNewDiscounts(newData) {
+        const newDiscounts = newData.filter(newProduct => 
+            !lastFetchedData.some(oldProduct => oldProduct.Id === newProduct.Id)
+        );
+
+        if (newDiscounts.length > 0) {
+            newDiscounts.forEach(discount => {
+                showNotification('تخفیف جدید!', {
+                    body: `${discount.Title} با ${discount.DiscountPercent}% تخفیف.`,
+                    icon: discount.ImageUrl
+                });
+            });
+        }
+
+        lastFetchedData = newData;
+    }
+
+    // Request notification permission
+    if ('Notification' in window) {
+        Notification.requestPermission().then(permission => {
+            if (permission === 'granted') {
+                permissionGranted = true;
+            }
+        });
+    }
+
+    // Fetch data and setup UI
+    async function initialize() {
+        try {
+            const data = await fetchData();
+            allProducts = data.reverse();  // Reverse the order of products
+            lastFetchedData = allProducts;
+            displayProducts(allProducts);
+            setupSearch(allProducts);
+            loading.style.display = 'none';
+            searchContainer.style.display = 'flex';
+            productContainer.style.display = 'flex';
+        } catch (error) {
+            console.error('Failed to initialize:', error);
+        }
+    }
+
+    // Initialize the application
+    initialize();
+
+    // Set interval to fetch data every 30 seconds
+    setInterval(async () => {
+        try {
+            const newData = await fetchData();
+            newData.reverse(); // Reverse the order of products
+            checkForNewDiscounts(newData);
+            displayProducts(newData);
+            allProducts = newData;
+        } catch (error) {
+            console.error('Error updating the data:', error);
+        }
+    }, 30000);
 });
