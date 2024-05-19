@@ -110,6 +110,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
+    // Function to show notifications with delay
+    function showNotificationsWithDelay(notifications) {
+        notifications.forEach((notification, index) => {
+            setTimeout(() => {
+                showNotification(notification.title, notification.options);
+            }, index * 10000); // 10000 milliseconds = 10 seconds
+        });
+    }
+
     // Function to show notifications
     function showNotification(title, options) {
         if (permissionGranted && Notification.permission === 'granted') {
@@ -124,12 +133,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         );
 
         if (newDiscounts.length > 0) {
-            newDiscounts.forEach(discount => {
-                showNotification('تخفیف جدید!', {
+            const notifications = newDiscounts.map(discount => ({
+                title: 'تخفیف جدید!',
+                options: {
                     body: `${discount.Title} با ${discount.DiscountPercent}% تخفیف.`,
                     icon: discount.ImageUrl
-                });
-            });
+                }
+            }));
+            showNotificationsWithDelay(notifications);
         }
 
         lastFetchedData = newData;
