@@ -37,19 +37,34 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
+    // Function to encode URL to Base64 using UTF-8 encoding
+    function encodeToBase64(url) {
+        return btoa(unescape(encodeURIComponent(url)));
+    }
+
+    // Function to generate affiliate link
+    function generateAffiliateLink(digikalaUrl) {
+        // Extract the base URL without additional parameters
+        const baseUrl = digikalaUrl.split('/')[0] + '//' + digikalaUrl.split('/')[2] + '/' + digikalaUrl.split('/')[3] + '/' + digikalaUrl.split('/')[4] + '/';
+        const base64Url = encodeToBase64(baseUrl);
+        const affiliateLink = `https://dgkl.io/api/v1/Click/b/rGACB?b64=${base64Url}`;
+        return affiliateLink;
+    }
+
     // Function to display products
     function displayProducts(products) {
         productContainer.innerHTML = '';
         products.forEach(product => {
             const card = document.createElement('div');
             card.className = 'card';
+            const affiliateLink = generateAffiliateLink(`https://www.digikala.com/product/${product.Url.split('/')[2]}/`);
             card.innerHTML = `
                 <img src="${product.ImageUrl}" alt="${product.Title}">
                 <h2>${product.Title}</h2>
                 <p class="price">${product.SellingPrice.toLocaleString()} تومان</p>
                 <p class="old-price">${product.RrpPrice.toLocaleString()} تومان</p>
                 <p>تخفیف: ${product.Discount.toLocaleString()} تومان (${product.DiscountPercent}%)</p>
-                <a href="https://digikala.com${product.Url}" target="_blank">مشاهده محصول</a>
+                <a href="${affiliateLink}" target="_blank">مشاهده محصول</a>
             `;
             productContainer.appendChild(card);
         });
